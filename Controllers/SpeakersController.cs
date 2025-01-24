@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ITB2203Application.Controllers
@@ -16,8 +17,6 @@ namespace ITB2203Application.Controllers
         {
             _context = context;
         }
-
-        //Speaker Section
 
         [HttpGet]
         public ActionResult<IEnumerable<Speaker>> GetSpeakers(string? Name = null)
@@ -60,9 +59,20 @@ namespace ITB2203Application.Controllers
         [HttpPost]
         public ActionResult<Speaker> PostSpeaker(Speaker speaker)
         {
+            if (!speaker.Email.Contains('@'))
+            {
+                return BadRequest("404 (Not Found)");
+            }
+
             var dbSpeaker = _context.Speakers!.Find(speaker.Id);
             if (dbSpeaker == null)
             {
+                var dbSpeakerEmail = _context.Speakers.FirstOrDefault(a => a.Email == speaker.Email);
+                if (dbSpeakerEmail != null)
+                {
+                    return BadRequest("404 (Not Found)");
+                }
+
                 _context.Add(speaker);
                 _context.SaveChanges();
 

@@ -17,8 +17,6 @@ namespace ITB2203Application.Controllers
             _context = context;
         }
 
-        //Event Section
-
         [HttpGet]
         public ActionResult<IEnumerable<Event>> GetEvents(string? Name = null)
         {
@@ -69,6 +67,7 @@ namespace ITB2203Application.Controllers
 
                 return CreatedAtAction(nameof(GetEvent), new { Id = events.Id }, events);
             }
+
             else
             {
                 return Conflict();

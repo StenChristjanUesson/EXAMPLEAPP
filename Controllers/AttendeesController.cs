@@ -17,7 +17,6 @@ public class AttendeesController : ControllerBase
         _context = context;
     }
 
-    //Attendee Section
 
     [HttpGet]
     public ActionResult<IEnumerable<Attendee>> GetAttendees(string? Name = null)
@@ -61,14 +60,33 @@ public class AttendeesController : ControllerBase
     [HttpPost]
     public ActionResult<Attendee> PostAttendee(Attendee attendee)
     {
+        var eventDetails = _context.Events.FirstOrDefault(e => e.Id == attendee.EventId);
+        if (eventDetails == null || attendee.RegistrationTime >= eventDetails.Date)
+        {
+            return BadRequest("404 (Not Found)");
+        }
+
+        if (!attendee.Email.Contains('@'))
+        {
+            return BadRequest("404 (Not Found)");
+        }
+
         var dbAttendee = _context.Attendees!.Find(attendee.Id);
         if (dbAttendee == null)
         {
+
+            var dbAttendeeEmail = _context.Attendees.FirstOrDefault(a => a.Email == attendee.Email);
+            if (dbAttendeeEmail != null)
+            {
+                return BadRequest("404 (Not Found)");
+            }
+
             _context.Add(attendee);
             _context.SaveChanges();
 
             return CreatedAtAction(nameof(GetAttendee), new { Id = attendee.Id }, attendee);
         }
+
         else
         {
             return Conflict();
