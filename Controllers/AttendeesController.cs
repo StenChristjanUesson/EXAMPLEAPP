@@ -21,7 +21,7 @@ public class AttendeesController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Attendee>> GetAttendees(string? Name = null)
     {
-        var query = _context.Attendees!.AsQueryable();
+        var query = _context.Attendee!.AsQueryable();
 
         if (Name != null)
             query = query.Where(x => x.Name != null && x.Name.ToUpper().Contains(Name.ToUpper()));
@@ -32,7 +32,7 @@ public class AttendeesController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<TextReader> GetAttendee(int id)
     {
-        var attendee = _context.Attendees!.Find(id);
+        var attendee = _context.Attendee!.Find(id);
 
         if (attendee == null)
         {
@@ -45,7 +45,7 @@ public class AttendeesController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult PutAttendee(int id, Attendee attendee)
     {
-        var dbAttendee = _context.Attendees!.AsNoTracking().FirstOrDefault(x => x.Id == attendee.Id);
+        var dbAttendee = _context.Attendee!.AsNoTracking().FirstOrDefault(x => x.Id == attendee.Id);
         if (id != attendee.Id || dbAttendee == null)
         {
             return NotFound();
@@ -60,8 +60,8 @@ public class AttendeesController : ControllerBase
     [HttpPost]
     public ActionResult<Attendee> PostAttendee(Attendee attendee)
     {
-        var eventDetails = _context.Events.FirstOrDefault(e => e.Id == attendee.EventId);
-        if (eventDetails == null || attendee.RegistrationTime >= eventDetails.Date)
+        var eventDetails = _context.Attendee.FirstOrDefault(e => e.Id == attendee.EventId);
+        if (eventDetails == null || attendee.RegistrationTime >= eventDetails.RegistrationTime)
         {
             return BadRequest("404 (Not Found)");
         }
@@ -71,11 +71,11 @@ public class AttendeesController : ControllerBase
             return BadRequest("404 (Not Found)");
         }
 
-        var dbAttendee = _context.Attendees!.Find(attendee.Id);
+        var dbAttendee = _context.Attendee!.Find(attendee.Id);
         if (dbAttendee == null)
         {
 
-            var dbAttendeeEmail = _context.Attendees.FirstOrDefault(a => a.Email == attendee.Email);
+            var dbAttendeeEmail = _context.Attendee.FirstOrDefault(a => a.Email == attendee.Email);
             if (dbAttendeeEmail != null)
             {
                 return BadRequest("404 (Not Found)");
@@ -96,7 +96,7 @@ public class AttendeesController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult DeleteAttendee(int id)
     {
-        var attendee = _context.Attendees!.Find(id);
+        var attendee = _context.Attendee!.Find(id);
         if (attendee == null)
         {
             return NotFound();
